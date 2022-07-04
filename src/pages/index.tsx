@@ -1,12 +1,17 @@
 import type { NextPage } from 'next';
-import Image from 'next/image';
+import Content from '../components/Content';
 
-import homepage from '../assets/homepage.jpg';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 
 const Home: NextPage = () => {
   return (
     <div>
-      <Image src={homepage} alt={'Initial page'} />
+      <Header />
+      <div className="flex">
+        <Sidebar />
+        <Content />
+      </div>
     </div>
   );
 };
