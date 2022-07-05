@@ -1,7 +1,5 @@
 import React from 'react';
 
-// import { Container } from './styles';
-
 const Sidebar: React.FC = () => {
   return (
     <div className="flex flex-col flex-1 h-screen max-w-xs pt-6 lg:ml-60">

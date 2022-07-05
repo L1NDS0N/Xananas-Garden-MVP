@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import Image from 'next/image';
 import React from 'react';
 
 // import { Container } from './styles';
@@ -14,7 +13,7 @@ const Content: React.FC = () => {
       <h1 className="m-8 font-bold text-xl">Rosas do deserto</h1>
 
       <div className="flex flex-col lg:max-w-[80%] gap-6 mx-8">
-        <div className="flex flex-col border border-zinc-200 rounded overflow-hidden">
+        <div className="border border-zinc-200 rounded overflow-hidden">
           <div className="flex max-h-56">
             <img
               width={200}

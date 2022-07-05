@@ -21,9 +21,7 @@ const Header: React.FC = () => {
       </div>
 
       <div className="flex flex-row w-full overflow-hidden">
-        <div className="max-h-10">
-          <Logo />
-        </div>
+          <Logo width={50} />
       </div>
     </div>
   );
