@@ -1,11 +1,17 @@
 import React from 'react';
 
-function Icon() {
+type LogoProps = {
+  className?: string;
+  width: number;
+  height?: number;
+}
+function Icon({className, width, height}: LogoProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="256"
-      height="256"
+      className={className}
+      width={width}
+      height={height}
       fill="none"
       viewBox="0 0 256 256"
     >
