@@ -1,19 +1,9 @@
 import type { NextPage } from 'next';
-import Content from '../components/Content';
 
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import Catalogo from './catalogo';
 
 const Home: NextPage = () => {
-  return (
-    <div>
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <Content />
-      </div>
-    </div>
-  );
+  return <Catalogo />;
 };
 
 export default Home;
