@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const AdminSidebar: React.FC = () => {
@@ -8,10 +9,10 @@ const AdminSidebar: React.FC = () => {
           <h1 className="leading-relaxed font-bold text-xl">Cadastrar</h1>
           <ul className="flex flex-col gap-1 pl-2">
             <li>
-              <a href="/admin/dashboard/categorias">Categorias</a>
+              <Link href="/admin/dashboard/categorias">Categorias</Link>
             </li>
             <li>
-              <a href="/admin/dashboard/produtos">Produtos</a>
+              <Link href="/admin/dashboard/produtos">Produtos</Link>
             </li>
           </ul>
         </div>
