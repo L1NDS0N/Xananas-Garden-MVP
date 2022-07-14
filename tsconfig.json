@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/admin/dashboard/produtos.tsx", "src/pages/admin/dashboard/...categorias.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/admin/dashboard/produtos.tsx", "src/pages/admin/dashboard/...categorias.tsx", "src/hooks/useNestLayout.ts"],
   "exclude": ["node_modules"]
 }
