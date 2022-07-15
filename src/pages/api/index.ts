@@ -10,3 +10,4 @@ export default function handler(
 ) {
   res.status(200).json({ error: 'Try the route [...]/api/v1/...' });
 }
+
