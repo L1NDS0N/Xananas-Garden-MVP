@@ -9,7 +9,7 @@ export class ProductsController {
     const productsService = new ProductsService(productsRepository);
 
     const { body: data } = request as { body: ProductsPublishData };
-    
+
     try {
       await productsService.create(data);
 
@@ -23,7 +23,7 @@ export class ProductsController {
     const productsRepository = new PrismaProductsRepository();
     const productsService = new ProductsService(productsRepository);
 
-    const { id } = request.query as { id: string };
+    const id = request.query.id as string;
 
     try {
       const product = await productsService.findOne(id);
@@ -37,7 +37,7 @@ export class ProductsController {
     const productsRepository = new PrismaProductsRepository();
     const productsService = new ProductsService(productsRepository);
 
-    const { id } = request.query as { id: string };
+    const id = request.query.id as string;
     const { body: data } = request as { body: ProductsPublishData };
 
     try {
@@ -53,7 +53,7 @@ export class ProductsController {
     const productsRepository = new PrismaProductsRepository();
     const productsService = new ProductsService(productsRepository);
 
-    const { id } = request.query as { id: string };
+    const id = request.query.id as string;
 
     try {
       await productsService.deleteOne(id);

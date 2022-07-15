@@ -19,7 +19,7 @@ export class UsersController {
   async getUser(request: NextApiRequest, response: NextApiResponse) {
     const usersRepository = new PrismaUsersRepository();
     const usersService = new UsersService(usersRepository);
-    const { id } = request.query as { id: string };
+    const id = request.query.id as string;
 
     try {
       const user = await usersService.findOne(id);
@@ -33,7 +33,7 @@ export class UsersController {
     const usersRepository = new PrismaUsersRepository();
     const usersService = new UsersService(usersRepository);
 
-    const { id } = request.query as { id: string };
+    const id = request.query.id as string;
     const { body: data } = request as { body: UsersUpdateData };
 
     try {
