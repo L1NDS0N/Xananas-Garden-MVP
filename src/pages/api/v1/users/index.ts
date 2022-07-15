@@ -4,7 +4,7 @@ import { UsersController } from '../../../../server/src/controllers/users-contro
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const usersController = new UsersController();
 
-  res.setHeader('Allow', ['PUT', 'POST']);
+  res.setHeader('Allow', ['POST']);
 
   switch (req.method) {
     case 'POST':
