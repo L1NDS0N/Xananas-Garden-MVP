@@ -11,4 +11,10 @@ export interface ProductsCategoryPublishData {
 
 export interface IProductsCategoryRepository {
   create: (data: ProductsCategoryPublishData) => Promise<void>;
+  findAll: () => Promise<ProductsCategoryData[]>;
+  deleteOne: (id: string) => Promise<void>;
+  updateOne: (
+    id: string,
+    data: ProductsCategoryPublishData,
+  ) => Promise<ProductsCategoryData>;
 }

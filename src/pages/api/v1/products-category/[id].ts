@@ -3,14 +3,14 @@ import { ProductsCategoryController } from '../../../../server/src/controllers/p
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const productsCategoryController = new ProductsCategoryController();
-  res.setHeader('Allow', ['GET', 'POST']);
+  res.setHeader('Allow', ['PUT', 'DELETE']);
 
   switch (req.method) {
-    case 'POST':
-      productsCategoryController.postProductCategory(req, res);
+    case 'PUT':
+      productsCategoryController.putProductCategory(req, res);
       break;
-    case 'GET':
-      productsCategoryController.getProductCategories(req, res);
+    case 'DELETE':
+      productsCategoryController.deleteProductCategory(req, res);
 
     default:
       res.status(405).end({ error: 'Method not allowed' });
