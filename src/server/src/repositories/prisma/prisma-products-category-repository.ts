@@ -1,5 +1,5 @@
 import { prisma } from '../../../../lib/prisma';
-import { IProductsCategoryRepository } from '../products-category-repository';
+import { IProductsCategoryRepository, ProductsCategoryData } from '../products-category-repository';
 import { ProductsCategoryPublishData } from './../products-category-repository';
 
 export class PrismaProductsCategoryRepository
@@ -16,6 +16,13 @@ export class PrismaProductsCategoryRepository
   public async findAll(): Promise<ProductsCategoryPublishData[]> {
     const productsCategories = await prisma.productCategory.findMany();
     return productsCategories;
+  }
+
+  public async findOne(id: string): Promise<ProductsCategoryData | null> {
+    const category = await prisma.productCategory.findUnique({
+      where: { id },
+    });
+    return category as ProductsCategoryData | null;
   }
 
   public async deleteOne(id: string): Promise<void> {

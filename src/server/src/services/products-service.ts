@@ -1,4 +1,4 @@
-import { IProductsRepository, ProductsPublishData } from "../repositories/products-repository";
+import { IProductsRepository, ProductsPublishData, ProductFilters } from '../repositories/products-repository';
 
 export class ProductsService {
   constructor(private readonly productsRepository: IProductsRepository) {}
@@ -8,13 +8,19 @@ export class ProductsService {
     return product;
   }
 
-  async findAll() {
-    const products = await this.productsRepository.findAll();
+  async findBySlug(slug: string) {
+    const product = await this.productsRepository.findBySlug(slug);
+    return product;
+  }
+
+  async findAll(filters?: ProductFilters) {
+    const products = await this.productsRepository.findAll(filters);
     return products;
   }
 
   async create(data: ProductsPublishData) {
-    await this.productsRepository.create(data);
+    const id = await this.productsRepository.create(data);
+    return { id };
   }
 
   async updateOne(id: string, data: ProductsPublishData) {
@@ -23,5 +29,21 @@ export class ProductsService {
 
   async deleteOne(id: string) {
     await this.productsRepository.deleteOne(id);
+  }
+
+  async addImages(productId: string, images: { image: string; order?: number }[]) {
+    await this.productsRepository.addImages(productId, images);
+  }
+
+  async deleteImage(imageId: string) {
+    await this.productsRepository.deleteImage(imageId);
+  }
+
+  async reorderImages(productId: string, imageOrders: { id: string; order: number }[]) {
+    await this.productsRepository.reorderImages(productId, imageOrders);
+  }
+
+  async updateVideoPosition(productId: string, position: number) {
+    await this.productsRepository.updateVideoPosition(productId, position);
   }
 }

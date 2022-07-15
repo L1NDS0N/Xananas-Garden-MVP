@@ -10,6 +10,8 @@
 
 # next.js
 /.next/
+/.freebuff/
+/.claude/
 /out/
 
 # production
@@ -34,3 +36,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 .env
+prisma/dev.db

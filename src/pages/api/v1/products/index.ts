@@ -1,17 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ProductsController } from '../../../../server/src/controllers/products-controller';
+import { withETag } from '../../_etag';
+
+const getHandler = withETag(async (req: NextApiRequest, res: NextApiResponse) => {
+  const productsController = new ProductsController();
+  await productsController.getProducts(req, res);
+}, 30);
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader('Allow', ['GET', 'POST']);
-  const productsController = new ProductsController();
 
   switch (req.method) {
     case 'GET':
-      productsController.getProducts(req, res);
-      break;
+      return getHandler(req, res);
     case 'POST':
-      productsController.postProduct(req, res);
-      break;
+      return new ProductsController().postProduct(req, res);
     default:
       res.status(405).json({ error: 'Method not allowed' });
   }

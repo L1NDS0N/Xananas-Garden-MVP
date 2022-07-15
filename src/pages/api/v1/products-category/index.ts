@@ -11,8 +11,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       break;
     case 'GET':
       productsCategoryController.getProductCategories(req, res);
-
+      break;
     default:
-      res.status(405).end({ error: 'Method not allowed' });
+      res.status(405).json({ error: 'Method not allowed' });
   }
 }

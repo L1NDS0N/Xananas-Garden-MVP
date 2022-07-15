@@ -3,17 +3,20 @@ import { ProductsController } from '../../../../server/src/controllers/products-
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const productsController = new ProductsController();
-  res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+  res.setHeader('Allow', ['GET', 'PUT', 'DELETE', 'PATCH']);
 
   switch (req.method) {
     case 'GET':
       productsController.getProduct(req, res);
-      break;   
+      break;
     case 'PUT':
       productsController.putProduct(req, res);
       break;
     case 'DELETE':
       productsController.deleteProduct(req, res);
+      break;
+    case 'PATCH':
+      productsController.reorderImages(req, res);
       break;
     default:
       res.status(405).json({ error: 'Method not allowed' });
