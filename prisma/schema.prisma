@@ -1,9 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -12,51 +13,473 @@ model User {
   name      String
   username  String   @unique
   email     String   @unique
+  phone     String?
+  whatsapp  String?
+  avatar    String?
+  googleId  String?  @unique
   admin     Boolean  @default(false)
+  role      String   @default("admin") // admin | manager | cashier | viewer
+
+  googleAccounts UserGoogleAccount[]
   password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 
-  @@map(name: "users")
+  sales Sale[]
+  cashFlows CashFlow[]
+  purchases Purchase[]
+  couponUsages CouponUsage[]
+  createdProducts  Product[] @relation("ProductCreatedBy")
+  updatedProducts  Product[] @relation("ProductUpdatedBy")
+
+  @@map("users")
 }
 
 model Product {
   id          String   @id @default(uuid())
   name        String
+  slug        String   @unique
   description String
   price       Float?
+  priceNegotiable Boolean @default(false) // exibe "A negociar" no catálogo em vez do preço
   note        String?
   amount      Int?
   published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt()
+  videoUrl      String?
+  videoPosition Int      @default(99)
+  maxInstallments Int    @default(12)
+  installmentInterest Boolean @default(false)
+  costPrice      Float?          // custo de aquisição (da compra)
+  profitMargin   Float?          // margem de lucro % desejada
+  lowStockThreshold Int @default(5) // alerta quando estoque baixa disso
+  tags           String?         // hashtags separadas por vírgula, usadas para recomendação de produtos relacionados
+  createdAt     DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   categoryId String
   category   ProductCategory @relation(fields: [categoryId], references: [id])
 
-  images ProductImage[]
+  createdById String?
+  createdBy  User?   @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy  User?   @relation("ProductUpdatedBy", fields: [updatedById], references: [id])
 
-  @@map(name: "products")
+  images        ProductImage[]
+  saleItems     SaleItem[]
+  stockHistory  StockHistory[]
+  purchaseRequestItems PurchaseRequestItem[]
+  campaigns     CampaignProduct[]
+  supplierProducts SupplierProduct[]
+  purchaseItems PurchaseItem[]
+  wishlists     Wishlist[]
+  categoryLinks ProductCategoryLink[] // categorias adicionais, além da principal (categoryId)
+  paymentMethodLinks ProductPaymentMethod[] // formas de pagamento aceitas — vazio = aceita todas as ativas
+
+  @@map("products")
+}
+
+/**
+ * Cadastro de formas de pagamento suportadas pela loja (Dinheiro, Cartão, PIX, etc).
+ * Cada uma pode aplicar um desconto ou acréscimo automático sobre o total da venda.
+ */
+model PaymentMethod {
+  id                  String   @id @default(uuid())
+  key                 String   @unique // slug estável usado em Sale.paymentType, ex: "money", "card", "pix"
+  name                String   // rótulo exibido, ex: "Cartão de Crédito"
+  active              Boolean  @default(true)
+  isDefault           Boolean  @default(false) // pré-selecionado ao cadastrar um novo produto
+  maxInstallments     Int      @default(1)
+  adjustmentType      String?  // "discount" | "surcharge" | null (sem ajuste)
+  adjustmentValueType String?  // "percentage" | "fixed"
+  adjustmentValue     Float?
+  order               Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  productLinks ProductPaymentMethod[]
+
+  @@map("payment_methods")
+}
+
+/** Formas de pagamento habilitadas para um produto específico — sobrescreve o padrão do sistema. */
+model ProductPaymentMethod {
+  id              String   @id @default(uuid())
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  paymentMethodId String
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+
+  @@unique([productId, paymentMethodId])
+  @@index([paymentMethodId])
+  @@map("product_payment_methods")
 }
 
 model ProductCategory {
   id        String   @id @default(uuid())
   name      String   @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
 
-  Product Product[]
-  @@map(name: "product_categories")
+  Product       Product[]
+  productLinks  ProductCategoryLink[]
+
+  @@map("product_categories")
+}
+
+/** Categorias adicionais associadas a um produto — a categoria principal continua em Product.categoryId. */
+model ProductCategoryLink {
+  id         String   @id @default(uuid())
+  productId  String
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([productId, categoryId])
+  @@index([categoryId])
+  @@map("product_category_links")
 }
 
 model ProductImage {
   id        String   @id @default(uuid())
-  image     String
+  image     String   // minified WebP only (320px wide)
+  order     Int      @default(0)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  updatedAt DateTime @updatedAt
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model Sale {
+  id          String   @id @default(uuid())
+  total       Float
+  discount    Float    @default(0)
+  finalTotal  Float
+  paymentType String   @default("money")
+  status      String   @default("completed") // pending | confirmed | preparing | shipped | delivered | cancelled
+  notes       String?
+  couponCode  String?
+  createdAt   DateTime @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  items SaleItem[]
+  couponUsage CouponUsage?
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+
+  saleId    String
+  sale      Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+model CashFlow {
+  id          String   @id @default(uuid())
+  type        String   // 'entry' | 'exit' | 'opening' | 'closing'
+  description String
+  amount      Float
+  referenceId String?  // sale ID, adjustment ID, etc.
+  createdAt   DateTime @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@map("cash_flows")
+}
+
+model StockHistory {
+  id          String   @id @default(uuid())
+  type        String   // 'sale' | 'entry' | 'adjustment' | 'return'
+  quantity    Int
+  previousAmount Int
+  newAmount   Int
+  reason      String?
+  referenceId String?  // sale ID, etc.
+  createdAt   DateTime @default(now())
 
   productId String
   product   Product @relation(fields: [productId], references: [id])
 
-  @@map(name: "product_images")
+  @@map("stock_history")
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  cpf       String?
+  phone     String?
+  whatsapp  String?
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sales Sale[]
+  purchaseRequests PurchaseRequest[]
+
+  @@map("clients")
+}
+
+model PurchaseRequest {
+  id          String   @id @default(uuid())
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  customerAddress String  // full formatted address
+  customerStreet String?
+  customerNumber String?
+  customerNeighborhood String?
+  customerCity  String?
+  customerState String?
+  customerZip   String?
+  customerPhoneCode String? @default("55")
+  customerNotes String?
+  status      String   @default("pending") // pending | approved | rejected | delivered
+  total       Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  items PurchaseRequestItem[]
+
+  @@map("purchase_requests")
+}
+
+model PurchaseRequestItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+
+  requestId String
+  request   PurchaseRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("purchase_request_items")
+}
+
+model UserGoogleAccount {
+  id            String   @id @default(uuid())
+  googleId      String
+  email         String
+  name          String?
+  avatar        String?
+  isPrimary     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, googleId])
+  @@map("user_google_accounts")
+}
+
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String?  @unique // friendly URL for the public campaign page
+  description String?
+  heroTitle   String?  // headline for carousel
+  heroSubtitle String?
+  discountType String  @default("percentage") // percentage | fixed
+  discountValue Float @default(0)
+  themeColor  String?  @default("#de818d") // accent color for campaign
+  bgColor     String?  @default("#fff0f3") // background color
+  textColor   String?  @default("#ffffff") // text/contrast color for overlays
+  glowColor   String?  // border/glow accent for product cards (falls back to themeColor)
+  heroImage   String?  // base64 hero image
+  heroVideo   String?  // youtube URL for hero
+  modalImage  String?  // base64 for popup modal
+  modalTitle  String?
+  modalSubtitle String?
+  showModal   Boolean  @default(true) // show popup on first visit
+  startDate   DateTime?
+  endDate     DateTime?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products CampaignProduct[]
+
+  @@map("campaigns")
+}
+
+model CampaignProduct {
+  id         String   @id @default(uuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  highlightColor String?  // optional per-product highlight color
+  promoPrice    Float?   // per-product promotional price (overrides campaign global discount)
+  discountType  String?  // percentage | fixed — alternative to promoPrice, per-product discount
+  discountValue Float?   // used together with discountType
+
+  @@unique([campaignId, productId])
+  @@map("campaign_products")
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  cnpj      String?
+  phone     String?
+  whatsapp  String?
+  email     String?
+  address   String?
+  notes     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products SupplierProduct[]
+  purchases Purchase[]
+
+  @@map("suppliers")
+}
+
+model SupplierProduct {
+  id          String   @id @default(uuid())
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  costPrice   Float?             // preço que este fornecedor cobra
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([supplierId, productId])
+  @@map("supplier_products")
+}
+
+model Purchase {
+  id          String   @id @default(uuid())
+  invoice     String?            // nota fiscal / código da compra
+  type        String   @default("stock") // 'stock' (entra no estoque) | 'standalone' (só registro)
+  total       Float    @default(0)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  supplierId  String?
+  supplier    Supplier? @relation(fields: [supplierId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  items       PurchaseItem[]
+
+  @@map("purchases")
+}
+
+model PurchaseItem {
+  id          String   @id @default(uuid())
+  quantity    Int      @default(1)
+  unitCost    Float               // custo unitário na compra
+  totalCost   Float               // quantity * unitCost
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+
+  purchaseId  String
+  purchase    Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+
+  @@map("purchase_items")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model Coupon {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  description   String?
+  discountType  String   @default("percentage") // percentage | fixed
+  discountValue Float
+  targetType    String   @default("global") // global | category | product
+  targetId      String?  // categoryId or productId (null for global)
+  minAmount     Float    @default(0)
+  maxUses       Int?
+  usedCount     Int      @default(0)
+  startsAt      DateTime?
+  expiresAt     DateTime?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  usages CouponUsage[]
+
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id             String   @id @default(uuid())
+  couponId       String
+  coupon         Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  saleId         String   @unique
+  sale           Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  discountAmount Float
+  createdAt      DateTime @default(now())
+
+  @@index([couponId])
+  @@index([createdAt])
+  @@map("coupon_usages")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sessionId String   // anonymous user session identifier
+  createdAt DateTime @default(now())
+
+  @@unique([productId, sessionId])
+  @@map("wishlists")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // create | update | delete
+  entity    String   // product | sale | user | category | etc
+  entityId  String?
+  changes   String?  // JSON of old/new values
+  userId    String?
+  userName  String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -1,9 +1,10 @@
-import type { NextPage } from 'next';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-import Catalogo from './catalogo';
-
-const Home: NextPage = () => {
-  return <Catalogo />;
-};
-
-export default Home;
+export default function Home() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/catalogo');
+  }, [router]);
+  return null;
+}

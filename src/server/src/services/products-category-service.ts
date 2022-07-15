@@ -27,4 +27,8 @@ export class ProductsCategoryService {
   public async findAll(): Promise<ProductsCategoryPublishData[]> {
     return this.productsCategoryRepository.findAll();
   }
+
+  public async findOne(id: string): Promise<ProductsCategoryData | null> {
+    return this.productsCategoryRepository.findOne(id);
+  }
 }

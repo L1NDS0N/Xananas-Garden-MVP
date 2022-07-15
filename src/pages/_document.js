@@ -2,15 +2,194 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html>
+    <Html lang="pt-BR">
       <Head>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
-        <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap" rel="stylesheet"/>
+        <meta charSet="utf-8" />
+        {/* Microsoft Clarity */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window, document, "clarity", "script", "ybjat3fyu1");
+        ` }} />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap" rel="stylesheet" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff5f6 0%, #ffe0e3 50%, #ffd1d6 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+          }
+          #splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+          }
+          .splash-logo-wrapper {
+            animation: splashFloatIn 1s cubic-bezier(0.34,1.56,0.64,1) both;
+            position: relative;
+          }
+          .splash-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -16px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(222,129,141,0.25) 0%, transparent 70%);
+            animation: splashGlow 2s ease-in-out infinite;
+          }
+          .splash-logo-svg {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 8px 30px rgba(222,129,141,0.35));
+            animation: splashIconFloat 2.5s ease-in-out infinite 0.5s, splashIconGlow 2.5s ease-in-out infinite 0.5s;
+            position: relative;
+            z-index: 1;
+          }
+          .splash-logo-svg .logo-rect {
+            transform-origin: center;
+          }
+          .splash-logo-svg .logo-paths {
+            animation: splashDraw 1.2s ease-out 0.4s both;
+          }
+          .splash-ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            margin: -60px 0 0 -60px;
+            border: 1.5px solid rgba(222,129,141,0.3);
+            border-radius: 30px;
+            animation: splashDropRipple 2.5s ease-out infinite;
+            z-index: 0;
+          }
+          .splash-ripple:nth-child(2) { animation-delay: 0.8s; }
+          .splash-ripple:nth-child(3) { animation-delay: 1.6s; }
+          .splash-title {
+            font-family: 'Gloria Hallelujah', cursive;
+            color: #de818d;
+            font-size: 32px;
+            margin-top: 32px;
+            letter-spacing: 1px;
+            animation: splashFadeUp 0.8s ease-out 0.3s both;
+          }
+          .splash-subtitle {
+            color: #b0b0b0;
+            font-size: 14px;
+            margin-top: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: splashFadeUp 0.8s ease-out 0.5s both;
+          }
+          .splash-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 40px;
+            animation: splashFadeUp 0.8s ease-out 0.7s both;
+          }
+          .splash-dot {
+            width: 8px;
+            height: 8px;
+            background: #de818d;
+            border-radius: 50%;
+            animation: splashBounce 1.4s ease-in-out infinite;
+          }
+          .splash-dot:nth-child(2) { animation-delay: 0.15s; }
+          .splash-dot:nth-child(3) { animation-delay: 0.3s; }
+
+          @keyframes splashFloatIn {
+            0% { opacity: 0; transform: translateY(40px) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          @keyframes splashIconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+          }
+          @keyframes splashIconGlow {
+            0%, 100% { filter: drop-shadow(0 8px 24px rgba(222,129,141,0.25)); }
+            50% { filter: drop-shadow(0 8px 36px rgba(222,129,141,0.45)); }
+          }
+          @keyframes splashDraw {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+          }
+          @keyframes splashDropRipple {
+            0% {
+              transform: scale(0.85);
+              opacity: 0.55;
+              border-color: rgba(222,129,141,0.35);
+            }
+            100% {
+              transform: scale(1.8);
+              opacity: 0;
+              border-color: rgba(222,129,141,0);
+            }
+          }
+          @keyframes splashGlow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 1; }
+          }
+
+          @keyframes splashFadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes splashBounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-12px); opacity: 1; }
+          }
+        ` }} />
       </Head>
       <body>
+        {/* Splash Screen — pure HTML/CSS, renders before React */}
+        <div id="splash-screen">
+          <div className="splash-logo-wrapper">
+            <div className="splash-ripple"></div>
+            <div className="splash-ripple"></div>
+            <div className="splash-ripple"></div>
+            <svg className="splash-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+              <rect className="logo-rect" x="1" y="1" width="254" height="254" rx="30" fill="none" stroke="#de818d" strokeWidth="2"/>
+              <g className="logo-paths">
+                <path fill="#de818d" d="M159.932 207.819c-4.142 2.669-12.798 6.349-17.14 7.287-6.233 1.346-10.261 1.292-15.696-.209-2.4-.662-6.96-1.198-10.132-1.189-10.066.027-13.039-1.93-17.065-11.231-3.077-7.109-3.43-10.853-1.6-17.014l1.235-4.164-5.635 2.97c-11 5.796-16.081 6.167-27.365 1.996-12.123-4.482-20.095-11.898-22.646-21.065-1.552-5.58-1.374-9.571.69-15.44.835-2.373 1.81-6.627 2.165-9.453.995-7.895 2.58-10.798 9.007-16.499 4.293-3.808 6.486-5.275 10.866-7.271 3.018-1.375 5.791-2.768 6.162-3.095.465-.411-.182-1.546-2.091-3.666-4.773-5.301-7.234-13.886-5.33-18.6.444-1.1 1.697-3.1 2.785-4.444 1.41-1.742 2.238-3.994 2.889-7.858 1.5-8.91 2.769-11.024 11.19-18.645 7.195-6.511 7.233-6.536 12.466-8.057 6.443-1.873 11.829-.947 16.649 2.862 4.138 3.27 4.844 3.433 11.216 2.59 7.362-.975 10.531-.224 13.128 3.114 1.148 1.475 2.235 2.371 2.541 2.096.293-.265 1.91-2.337 3.593-4.604 3.906-5.264 6.021-7.163 10.34-9.287 6.749-3.319 9.685-2.628 27.402 6.445 12.262 6.28 15.062 10.513 13.028 19.697-.725 3.274-.649 5.592.297 9.026.7 2.541 1.066 5.886.815 7.433-.584 3.582-3.52 9.032-7.024 13.033-1.503 1.718-2.579 3.295-2.389 3.505.189.21 1.284.525 2.434.7 7.397 1.126 14.041 5.297 19.778 12.416 5.52 6.85 7.322 11.741 6.809 18.475-.499 6.538-4.496 16.476-7.839 19.485-1.386 1.249-4.536 5.858-7.655 11.202-5.172 8.862-5.382 9.128-8.786 11.089-4.18 2.409-9.859 3.146-14.392 1.869-6.15-1.734-5.808-1.927-5.288 2.995.987 9.341-2.343 16.949-9.412 21.506z"/>
+                <path fill="#de818d" d="M30.075 39.873c0-1.367.114-2.702.342-4.004.228-1.302.472-2.604.732-3.906s.505-2.588.733-3.858c.26-1.302.39-2.636.39-4.003v-1.075c-.162-.13-.488-.407-.976-.83a68.147 68.147 0 01-1.66-1.611 584.913 584.913 0 00-1.953-2.05 32.281 32.281 0 01-1.905-2.393 20.867 20.867 0 01-1.416-2.393c-.358-.781-.537-1.53-.537-2.246v-.586c.033-.26.065-.488.098-.684.065-.227.179-.423.342-.586a.859.859 0 01.634-.244c.782 0 1.449.212 2.002.635.586.423 1.107.96 1.563 1.611.456.619.879 1.303 1.27 2.051a31 31 0 001.22 2.051c.456.618.944 1.14 1.465 1.562.553.424 1.204.635 1.953.635.749 0 1.432-.244 2.05-.732a10.335 10.335 0 001.759-1.807 50.907 50.907 0 001.758-2.392 18.12 18.12 0 012.001-2.393 9.692 9.692 0 012.442-1.855c.911-.489 1.97-.733 3.174-.733 0 .879-.212 1.677-.635 2.393-.39.716-.879 1.4-1.465 2.05a26.976 26.976 0 01-1.953 1.856 27.641 27.641 0 00-1.953 1.953 9.644 9.644 0 00-1.465 2.148c-.39.782-.586 1.644-.586 2.588 0 .456.325 1.09.977 1.905a38.862 38.862 0 002.392 2.685c.977.944 2.035 1.92 3.174 2.93 1.14.976 2.213 1.888 3.223 2.734a283.153 283.153 0 003.906 3.223c0 .065.016.244.049.537.032.26.049.44.049.537 0 .554-.13 1.058-.391 1.514-.228.456-.651.683-1.27.683-.065 0-.162-.016-.293-.048a.8.8 0 00-.195-.05l-1.123-.976c-.456-.456-.993-.96-1.611-1.514-.619-.553-1.27-1.123-1.953-1.708a73.16 73.16 0 00-1.953-1.71 47.756 47.756 0 00-1.71-1.464c-.52-.456-.895-.782-1.123-.977-.292-.26-.667-.57-1.123-.928-.455-.39-.911-.748-1.367-1.074a15.917 15.917 0 00-1.123-.879c-.325-.228-.504-.325-.537-.293l-1.074 1.075c-.26.293-.456.927-.586 1.904-.098.976-.195 2.132-.293 3.467a503.048 503.048 0 00-.293 4.15 35.463 35.463 0 01-.488 4.053c-.196 1.237-.505 2.262-.928 3.076-.423.814-.977 1.22-1.66 1.22-.619 0-1.09-.195-1.416-.585-.293-.39-.489-.863-.586-1.416a10.67 10.67 0 01-.147-1.758c.033-.586.05-1.074.05-1.465z"/>
+              </g>
+            </svg>
+          </div>
+          <h1 className="splash-title">Xananas&apos; Garden</h1>
+          <p className="splash-subtitle">Rosas do Deserto &amp; Cia</p>
+          <div className="splash-dots">
+            <div className="splash-dot"></div>
+            <div className="splash-dot"></div>
+            <div className="splash-dot"></div>
+          </div>
+        </div>
+
         <Main />
         <NextScript />
+
+        {/* Remove splash screen after React hydrates */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.addEventListener('load', function() {
+            setTimeout(function() {
+              var el = document.getElementById('splash-screen');
+              if (el) {
+                el.classList.add('hide');
+                setTimeout(function() { el.remove(); }, 400);
+              }
+            }, 800);
+          });
+        ` }} />
       </body>
     </Html>
   );
