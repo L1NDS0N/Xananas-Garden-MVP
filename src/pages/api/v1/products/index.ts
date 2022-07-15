@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ProductsController } from '../../../../server/src/controllers/products-controller';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.setHeader('Allow', ['GET', 'PUT']);
+  res.setHeader('Allow', ['GET', 'POST']);
   const productsController = new ProductsController();
 
   switch (req.method) {
