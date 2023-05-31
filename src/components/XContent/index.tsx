@@ -1,4 +1,4 @@
-import { MessageCircle } from "lucide-react";
+import { Send } from "lucide-react";
 import Head from "next/head";
 import { DADOS } from "../../faker/catalogo-fake";
 
@@ -6,7 +6,7 @@ interface ICategory {
   category: string;
 }
 
-export default function Content({ category }: ICategory) {
+export default function XContent({ category }: ICategory) {
   const content = DADOS;
 
   return (
@@ -52,7 +52,7 @@ export default function Content({ category }: ICategory) {
                         className="invisible flex h-8 w-8 items-center justify-center rounded-full hover:bg-green-400/50 group-hover:visible"
                       >
                         <div className="text-green-600">
-                          <MessageCircle size={30} />
+                          <Send size={24} />
                         </div>
                       </a>
                     </div>

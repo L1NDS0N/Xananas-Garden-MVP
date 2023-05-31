@@ -1,5 +1,5 @@
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
+import Header from '@/components/XHeader';
+import Sidebar from '@/components/XSidebar';
 
 export const metadata = {
 	title: 'KKKKKK',

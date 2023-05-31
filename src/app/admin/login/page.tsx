@@ -6,6 +6,7 @@ import { apiV1 } from "@/app/lib/axios";
 import { XButton } from "@/components/XButton";
 import { XToastContext } from "@/contexts/XToastContext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -37,6 +38,7 @@ export default function Login() {
   } = useForm<TLoginUserAdmin>({
     resolver: zodResolver(loginAdminUserSchema),
   });
+
   async function handleLogin(data: TLoginUserAdmin) {
     await apiV1
       .post<any>("/admin/auth", {
@@ -47,10 +49,18 @@ export default function Login() {
         sessionStorage.setItem("@xg:user", JSON.stringify(res.data));
       })
       .catch((err) => {
-        showXToast({
-          description: err.data.message,
-          title: "Erro no login",
-        });
+        if (err instanceof AxiosError) {
+          showXToast({
+            description: err.response?.data.error,
+            title: "Erro durante login",
+          });
+        } else {
+          console.log(err);
+          showXToast({
+            description: "erro desconhecido",
+            title: "Erro durante login",
+          });
+        }
       });
   }
   return (
@@ -74,7 +84,7 @@ export default function Login() {
                 {...register("username")}
                 autoFocus
                 type="text"
-                placeholder="Usuário"
+                placeholder="Nome de usuário ou E-mail"
                 className="h-10 rounded border border-zinc-200 p-2"
               />
               {errors.username && (

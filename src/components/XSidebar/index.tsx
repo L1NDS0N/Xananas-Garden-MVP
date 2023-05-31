@@ -1,4 +1,4 @@
-export default function Sidebar() {
+export default function XSidebar() {
   return (
     <div className={"flex h-full max-w-xs pt-6 lg:ml-24"}>
       <div className="flex flex-col p-2 items-center">

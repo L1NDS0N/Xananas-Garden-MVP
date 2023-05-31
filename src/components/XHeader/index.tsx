@@ -1,7 +1,7 @@
 import LogoImg from "../../assets/Logo";
 
 import { Search } from "lucide-react";
-export default function Header() {
+export default function XHeader() {
   return (
     <div
       className={
