@@ -18,7 +18,7 @@ type ToastStyle = {
   ToastIcon: IXIconProps;
 };
 
-export const useXToast = () => {
+export const getXToast = () => {
   const timerRef = React.useRef(0);
   const [open, setOpen] = React.useState(false);
   const [props, setProps] = React.useState<XToastProps>({

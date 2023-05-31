@@ -1,4 +1,4 @@
-import { XToastProps, useXToast } from "@/components/XToast";
+import { XToastProps, getXToast } from "@/components/XToast";
 import { createContext } from "react";
 
 type XToastContextType = {
@@ -12,7 +12,7 @@ type XToastContextProviderProps = {
 export const XToastContext = createContext({} as XToastContextType);
 
 export function XToastContextProvider(props: XToastContextProviderProps) {
-  const { showXToast, XToast } = useXToast();
+  const { showXToast, XToast } = getXToast();
 
   return (
     <XToastContext.Provider value={{ showXToast }}>

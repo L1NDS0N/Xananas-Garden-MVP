@@ -1,68 +1,26 @@
 "use client";
 
-import Head from "next/head";
-
-import { apiV1 } from "@/app/lib/axios";
+import { useUserAuth } from "@/app/hooks/useUserAuth";
 import { XButton } from "@/components/XButton";
-import { XToastContext } from "@/contexts/XToastContext";
+import {
+  TLoginUserAdmin,
+  adminUserLoginSchema,
+} from "@/schemas/admin-user-login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
-import { useContext } from "react";
+import Head from "next/head";
 import { useForm } from "react-hook-form";
-import z from "zod";
 import Logo from "../../../assets/Logo";
 
-const loginAdminUserSchema = z.object({
-  username: z
-    .string()
-    .min(8, "O apelido de usuário precisa de pelo menos 8 caracteres")
-    .max(
-      40,
-      "O apelido ou e-mail de usuário não pode ter mais do que 40 caracteres"
-    )
-    .nonempty("O campo de usuário é obrigatório"),
-  password: z
-    .string()
-    .min(8, "A senha precisa de no mínimo 6 caracteres")
-    .max(24, "A senha só pode ter no máximo 24 caracteres")
-    .nonempty("O campo de senha é obrigatório"),
-});
-type TLoginUserAdmin = z.infer<typeof loginAdminUserSchema>;
-
 export default function Login() {
-  const { showXToast } = useContext(XToastContext);
+  const { handleLogin } = useUserAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<TLoginUserAdmin>({
-    resolver: zodResolver(loginAdminUserSchema),
+    resolver: zodResolver(adminUserLoginSchema),
   });
 
-  async function handleLogin(data: TLoginUserAdmin) {
-    await apiV1
-      .post<any>("/admin/auth", {
-        email: data.username,
-        password: data.password,
-      })
-      .then((res) => {
-        sessionStorage.setItem("@xg:user", JSON.stringify(res.data));
-      })
-      .catch((err) => {
-        if (err instanceof AxiosError) {
-          showXToast({
-            description: err.response?.data.error,
-            title: "Erro durante login",
-          });
-        } else {
-          console.log(err);
-          showXToast({
-            description: "erro desconhecido",
-            title: "Erro durante login",
-          });
-        }
-      });
-  }
   return (
     <>
       <Head>
