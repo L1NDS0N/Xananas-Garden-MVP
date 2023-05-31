@@ -1,19 +1,30 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export type Middleware = (
+
+export type ErrorMiddleware = (
+	error: any,
+	req: NextApiRequest,
+	res: NextApiResponse,
+	next: (error?: any) => void
+) => void;
+
+export type CommonMiddleware = (
 	req: NextApiRequest,
 	res: NextApiResponse,
 	next: () => void
 ) => void;
+
+export type Middlewares = CommonMiddleware | ErrorMiddleware;
+
 type RouteHandler = (req: NextApiRequest, res: NextApiResponse) => void;
 
 export type NextApiRouter = {
-	get: (handler: RouteHandler, middlewares?: Middleware[]) => void;
-	post: (handler: RouteHandler, middlewares?: Middleware[]) => void;
-	put: (handler: RouteHandler, middlewares?: Middleware[]) => void;
-	delete: (handler: RouteHandler, middlewares?: Middleware[]) => void;
-	patch: (handler: RouteHandler, middlewares?: Middleware[]) => void;
-	use: (middleware: Middleware) => void;
+	get: (handler: RouteHandler, middlewares?: Middlewares[]) => void;
+	post: (handler: RouteHandler, middlewares?: Middlewares[]) => void;
+	put: (handler: RouteHandler, middlewares?: Middlewares[]) => void;
+	delete: (handler: RouteHandler, middlewares?: Middlewares[]) => void;
+	patch: (handler: RouteHandler, middlewares?: Middlewares[]) => void;
+	use: (middleware: Middlewares) => void;
 	handle: () => (req: NextApiRequest, res: NextApiResponse) => void;
 };
 
@@ -28,37 +39,36 @@ enum HttpMethod {
 type Route = {
 	method: HttpMethod;
 	handler: RouteHandler;
-	middlewares?: Middleware[];
+	middlewares?: Middlewares[];
 };
 
 function createNextApiRouter(): NextApiRouter {
 	const routes: Route[] = [];
 
-	function get(handler: RouteHandler, middlewares?: Middleware[]) {
+	function get(handler: RouteHandler, middlewares?: Middlewares[]) {
 		addRoute(HttpMethod.GET, handler, middlewares);
 	}
 
-	function post(handler: RouteHandler, middlewares?: Middleware[]) {
+	function post(handler: RouteHandler, middlewares?: Middlewares[]) {
 		addRoute(HttpMethod.POST, handler, middlewares);
 	}
 
-	function put(handler: RouteHandler, middlewares?: Middleware[]) {
+	function put(handler: RouteHandler, middlewares?: Middlewares[]) {
 		addRoute(HttpMethod.PUT, handler, middlewares);
 	}
 
-	function deleteRoute(handler: RouteHandler, middlewares?: Middleware[]) {
+	function deleteRoute(handler: RouteHandler, middlewares?: Middlewares[]) {
 		addRoute(HttpMethod.DELETE, handler, middlewares);
 	}
 
-	function patch(handler: RouteHandler, middlewares?: Middleware[]) {
+	function patch(handler: RouteHandler, middlewares?: Middlewares[]) {
 		addRoute(HttpMethod.PATCH, handler, middlewares);
 	}
 
-	function use(middleware: Middleware) {
+	function use(middleware: Middlewares) {
 		routes.forEach(route => {
 			if (!route.middlewares) {
 				route.middlewares = [];
-				route.middlewares.push(middleware);
 			} else {
 				route.middlewares.push(middleware);
 			}
@@ -68,7 +78,7 @@ function createNextApiRouter(): NextApiRouter {
 	function addRoute(
 		method: HttpMethod,
 		handler: RouteHandler,
-		middlewares?: Middleware[]
+		middlewares?: Middlewares[]
 	) {
 		const routeAlreadyExists = routes.find(route => route.method === method);
 		if (routeAlreadyExists) {
@@ -82,7 +92,7 @@ function createNextApiRouter(): NextApiRouter {
 			const method = req.method as HttpMethod;
 			const route = routes.find(route => route.method === method);
 			if (route) {
-				const middlewares: Middleware[] = [];
+				const middlewares: Middlewares[] = [];
 				if (route.middlewares) {
 					route.middlewares.forEach(middleware => {
 						middlewares.push(middleware);
@@ -99,15 +109,27 @@ function createNextApiRouter(): NextApiRouter {
 	function runMiddlewares(
 		req: NextApiRequest,
 		res: NextApiResponse,
-		middlewares: Middleware[]
+		middlewares: Middlewares[],		
 	) {
-		function next() {
+		function next(error?: any) {
 			const middleware = middlewares.shift();
+
 			if (middleware) {
+				if (isErrorMiddleware(middleware)) {
+					middleware(error, req, res, next);
+				} else {
 				middleware(req, res, next);
+				}
 			}
 		}
 		next();
+	}
+
+	function isErrorMiddleware(
+		middleware: Middlewares
+	): middleware is ErrorMiddleware {		
+		(middleware as ErrorMiddleware);
+		return true;
 	}
 
 	return {
