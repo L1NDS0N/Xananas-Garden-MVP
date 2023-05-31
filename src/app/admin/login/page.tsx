@@ -1,4 +1,5 @@
 "use client";
+
 import Head from "next/head";
 
 import { apiV1 } from "@/app/lib/axios";

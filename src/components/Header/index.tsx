@@ -1,7 +1,6 @@
-"use client";
 import LogoImg from "../../assets/Logo";
 
-import { MagnifyingGlass } from "phosphor-react";
+import { Search } from "lucide-react";
 export default function Header() {
   return (
     <div
@@ -16,7 +15,7 @@ export default function Header() {
       </div>
       <div className="w-full flex justify-start">
         <div className="flex flex-row w-96 h-12 rounded">
-          <MagnifyingGlass color="gray" className="self-center" size={32} />
+          <Search color="gray" className="self-center" size={32} />
           <input
             type="text"
             placeholder="Buscar produto"
