@@ -1,12 +1,10 @@
-import React from 'react';
-
-const Sidebar: React.FC = () => {
+export default function Sidebar() {
   return (
-    <div className="flex flex-col flex-1 h-screen max-w-xs pt-6 lg:ml-60">
-      <div className="flex flex-col p-2 items-center justify-center">
+    <div className={"flex h-full max-w-xs pt-6 lg:ml-24"}>
+      <div className="flex flex-col p-2 items-center">
         <div>
-          <h1 className="leading-relaxed font-bold text-xl">Categorias</h1>
-          <ul className="flex flex-col gap-1 pl-2">
+          <h1 className="font-bond text-xl">Categorias</h1>
+          <ul className="flex flex-col pl-2 leading-relaxed">
             <li>
               <a href="#">Tudo</a>
             </li>
@@ -25,22 +23,6 @@ const Sidebar: React.FC = () => {
           </ul>
         </div>
       </div>
-
-      <div className="flex flex-col p-2 items-center justify-center ">
-        <div>
-          <h1 className="leading-relaxed font-bold text-xl">Ordernar por</h1>
-          <ul className="flex flex-col gap-1 pl-2">
-            <li>
-              <a href="#">Maior preço</a>
-            </li>
-            <li>
-              <a href="#">Menor preço</a>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
   );
-};
-
-export default Sidebar;
+}

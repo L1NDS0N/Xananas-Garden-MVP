@@ -13,8 +13,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],      
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/admin/dashboard/produtos.tsx", "src/pages/admin/dashboard/...categorias.tsx", "src/hooks/useNestLayout.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "twtoast.config.js"],
   "exclude": ["node_modules"]
 }
