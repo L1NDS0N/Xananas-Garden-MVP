@@ -1,7 +1,7 @@
 "use client";
 
-import { useUserAuth } from "@/app/hooks/useUserAuth";
 import { XButton } from "@/components/XButton";
+import { useAuth } from "@/hooks/useUserAuth";
 import {
   TLoginUserAdmin,
   adminUserLoginSchema,
@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import Logo from "../../../assets/Logo";
 
 export default function Login() {
-  const { handleLogin } = useUserAuth();
+  const { handleLogin } = useAuth();
   const {
     register,
     handleSubmit,
