@@ -1,3 +1,6 @@
 import axios from 'axios';
 
-export const apiV1 = axios.create({ baseURL: '/api/v1' });
+import { useRouter } from '@/routes/routes.constants';
+
+const { url, port, path } =  useRouter().$b();
+export const apiV1 = axios.create({ baseURL: url + port + path });
