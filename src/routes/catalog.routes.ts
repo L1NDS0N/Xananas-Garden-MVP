@@ -13,8 +13,4 @@ export class CatalogRoutes<T extends ICatalog> extends GenericRoutes<T> {
     constructor(){
         super(CatalogRoutes.path);
     }
-     
-    fazerAlgoDiferente(req: IRequest<T>){
-        useGenericMethods<T>('teste').get(req);        
-    }
 }

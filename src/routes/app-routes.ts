@@ -6,8 +6,3 @@ export function useRoutes() {
 };
   
 }
-const { catalog } = useRoutes()
-catalog.fazerAlgoDiferente({then: (value: any) => {
-    console.log(value)
-}, 
-})
