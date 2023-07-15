@@ -7,7 +7,7 @@ type TButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	xTitle?: string;
 };
 
-export function XButton({ xType, xTitle, ...inherited }: TButtonProps) {
+export default function XButton({ xType, xTitle, ...inherited }: TButtonProps) {
 	const buttonTypeStilization = [
 		'bg-[#de818dcc] hover:bg-[#de818d] text-white',
 	][EButtonType[xType]];
