@@ -1,5 +1,5 @@
 import Header from '@/components/XHeader';
-import Sidebar from '@/components/XSidebar';
+import XSidebar from '@/components/XSidebar';
 
 export const metadata = {
 	title: 'Catálogo',
@@ -11,11 +11,18 @@ export default function CatalogoLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const items = [
+		{name:'Tudo', href: '#'},
+		{name:'Rosas do deserto', href: '#'},
+		{name:'Vasos plásticos', href: '#'},
+		{name:'Vasos de cimento', href: '#'},
+		{name:'Fertilizantes', href: '#'},
+	]
 	return (
 		<div>
 			<Header />
 			<div className='flex h-full'>
-				<Sidebar />
+				<XSidebar title='Categorias' items={items}/>
 				{children}
 			</div>
 		</div>
