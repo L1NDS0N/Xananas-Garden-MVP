@@ -10,23 +10,19 @@ interface ISidebarProps {
 
 export default function XSidebar({title, items}: ISidebarProps) {
   return (
-    <div className={"flex h-full max-w-xs pt-6 lg:ml-24"}>
-      <div className="flex flex-col p-2 items-center">
-        <div>
-          <h1 className="font-bond text-xl">{title}</h1>
-          <ul className="flex flex-col pl-2 leading-relaxed">
+    <div className={"flex h-full w-full pt-6 max-w-[12rem] mx-2"}>
+      <div className="flex flex-1 flex-col items-center">
+          <h1 className="font-bold text-xl">{title}</h1>
+          <div className="leading-relaxed">
             {
               items.map((item) => {
                 return (
-                  <li>
-                    <Link href={item.href}>{item.name}</Link>
-                  </li>
+                    <Link className="flex my-2 border-solid border-b border-transparent hover:border-zinc-300" href={item.href} >{item.name}</Link>
                 )
               })
             }
-          </ul>
+          </div>
         </div>
       </div>
-    </div>
   );
 }
