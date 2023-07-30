@@ -15,7 +15,7 @@ export class GenericRoutes<T> {
         this.path = path;
     }
 
-    get({then: $t, catch: $c, finally: $f, id}: IRequest<T>){
+    get({then: $t, catch: $c, finally: $f}: IRequest<T>){
         api.get<T[]>(this.path)
             .then((v) => {if ($t) $t(v as T)})
             .catch((e) => {if ($c) $c(e)})
@@ -30,14 +30,14 @@ export class GenericRoutes<T> {
     }
 
     post({then: $t, catch: $c, finally: $f, id, data}: IRequest<T>){
-        api.post<T>(this.path, {params: id, data})
+        api.post<T>(this.path, data, {params: id})
         .then((v) => {if ($t) $t(v as T)})
         .catch((e) => {if ($c) $c(e)})
         .finally(() => {if ($f) $f()});
     }
 
     put({then: $t, catch: $c, finally: $f, id, data}: IRequest<T>){        
-        api.put<T>(this.path, {params: id, data})
+        api.put<T>(this.path, data, {params: id})
         .then((v) => {if ($t) $t(v as T)})
         .catch((e) => {if ($c) $c(e)})
         .finally(() => {if ($f) $f()});

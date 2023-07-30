@@ -35,7 +35,7 @@ export function useGenericMethods<T>(path: string){
         get,
         post,
         put,
-        deleteOne
+        delete: deleteOne
     }
 
   

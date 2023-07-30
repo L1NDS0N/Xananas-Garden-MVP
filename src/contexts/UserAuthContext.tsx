@@ -1,7 +1,7 @@
 
 import handleKnownError from "@/helpers/handleKnownError";
 import { useXToast } from "@/hooks/useXToast";
-import { apiV1 } from "@/lib/axios";
+import { api } from "@/lib/axios";
 import { TLoginUserAdmin } from "@/schemas/admin-user-login.schema";
 import { createContext, ReactNode, useState } from "react";
 
@@ -36,7 +36,7 @@ export function UserAuthProvider(props: TAuthProvider) {
   async function handleLogin(data: TLoginUserAdmin) {
     setIsLoading(true);
     const { username, password } = data;
-    await apiV1
+    await api
       .post<any>("/admin/auth", {
         email: username,
         password,

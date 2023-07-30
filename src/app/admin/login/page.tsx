@@ -1,13 +1,14 @@
 "use client";
 
-import { XButton } from "@/components/XButton";
+import XButton from "@/components/XButton";
+import XPage from "@/components/XPage";
 import { useAuth } from "@/hooks/useUserAuth";
 import {
   TLoginUserAdmin,
   adminUserLoginSchema,
 } from "@/schemas/admin-user-login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Head from "next/head";
+import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import Logo from "../../../assets/Logo";
 
@@ -22,11 +23,8 @@ export default function Login() {
   });
 
   return (
-    <>
-      <Head>
-        <title>Login - Autentique-se no sistema</title>
-      </Head>
-
+    <XPage title="Login - Autentique-se no sistema">
+      
       <main className="flex h-screen flex-col items-center justify-center bg-zinc-100">
         <section className="min-h-80 flex max-h-96 w-[26rem] flex-1 rounded-lg bg-white shadow-sm">
           <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6">
@@ -66,6 +64,6 @@ export default function Login() {
           </div>
         </section>
       </main>
-    </>
+    </XPage>
   );
 }
