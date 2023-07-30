@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 type Props = React.InputHTMLAttributes<HTMLInputElement>;
 
-export default function XInput(props: Props) {
+const XInput = forwardRef((props: Props, ref: any) => {
   return (
     <input
       className="p-2 border border-zinc-200 rounded h-10"
-      {...props}
+      ref={ref}
       title={props.placeholder}
+      {...props}
     />
   );
-};
+});
+
+export default XInput;
