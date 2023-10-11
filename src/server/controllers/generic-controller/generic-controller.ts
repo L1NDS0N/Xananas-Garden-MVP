@@ -49,14 +49,13 @@ export default class TGenericController<T> implements IGenericController {
     }
     remove() {
         this.$router.delete(async (req, res) => {
-            // const { id } = req.query;
-            res.status(200).send(req.query);
-            // const succeded = await this.$repository.deleteOne(id as string);
-            // if (succeded) {
-            //     res.status(200).end();
-            // } else {
-            //     res.status(400).end();
-            // }
+            const { id } = req.query;
+            const succeded = await this.$repository.deleteOne(id as string);
+            if (succeded) {
+                res.status(200).end();
+            } else {
+                res.status(400).end();
+            }
         })
     }
 }
