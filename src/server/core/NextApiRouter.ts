@@ -71,7 +71,6 @@ function createNextApiRouter(): NextApiRouter {
 		middlewares?: Middleware[]
 	) {
 		const routeAlreadyExists = routes.find(route => route.method === method);
-		console.log({routes})
 		if (routeAlreadyExists) {
 			throw new Error(`It already has a route for ${method}`);
 		}
