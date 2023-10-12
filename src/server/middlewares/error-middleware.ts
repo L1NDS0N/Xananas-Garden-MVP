@@ -5,7 +5,6 @@ export const errorMiddleware = (
 	error: ApiError,
     req: NextApiRequest,
 	res: NextApiResponse,
-	next: () => void
 ) => {
 	const statusCode = error.statusCode ?? 500;
 	const message = error.statusCode ? error.message : 'Erro interno no servidor 😢';

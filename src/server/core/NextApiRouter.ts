@@ -1,11 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { errorMiddleware } from '../middlewares/error-middleware';
+
+type ErrorMiddleware = (error: any, req: NextApiRequest, res: NextApiResponse) => void;
 
 export type Middleware = (
 	req: NextApiRequest,
 	res: NextApiResponse,
-	next: () => void
+	next: (error?: any) => void
 ) => void;
-type RouteHandler = (req: NextApiRequest, res: NextApiResponse) => void;
+
+type RouteHandler = (
+	req: NextApiRequest,
+	res: NextApiResponse,
+	next: (error?: any) => void
+) => void;
+
 
 export type NextApiRouter = {
 	get: (handler: RouteHandler, middlewares?: Middleware[]) => void;
@@ -31,7 +40,7 @@ type Route = {
 	middlewares?: Middleware[];
 };
 
-function createNextApiRouter(): NextApiRouter {
+function createNextApiRouter(errorHandler: ErrorMiddleware = errorMiddleware): NextApiRouter {
 	const routes: Route[] = [];
 
 	function get(handler: RouteHandler, middlewares?: Middleware[]) {
@@ -78,36 +87,45 @@ function createNextApiRouter(): NextApiRouter {
 	}
 
 	function handle() {
-		return (req: NextApiRequest, res: NextApiResponse) => {
+		return async (req: NextApiRequest, res: NextApiResponse) => {
 			const method = req.method as HttpMethod;
 			const route = routes.find(route => route.method === method);
 			if (route) {
-				const middlewares: Middleware[] = [];
-				if (route.middlewares) {
-					route.middlewares.forEach(middleware => {
-						middlewares.push(middleware);
-					});
-				}
-				middlewares.push(route.handler);
-				runMiddlewares(req, res, middlewares);
+				const middlewares: Middleware[] = route.middlewares || [];
+				middlewares.push(route.handler);				
+				await runMiddlewares(req, res, middlewares, errorHandler);
+				
 			} else {
 				res.status(404).json({ error: 'Cannot find the route' });
 			}
 		};
 	}
 
-	function runMiddlewares(
+	async function runMiddlewares(
 		req: NextApiRequest,
 		res: NextApiResponse,
-		middlewares: Middleware[]
+		middlewares: Middleware[], 
+		errorHandler: ErrorMiddleware,
 	) {
-		function next() {
-			const middleware = middlewares.shift();
-			if (middleware) {
-				middleware(req, res, next);
+		return new Promise<void>((resolve) => {
+			async function next(error?: any) {
+				if (error) {
+					errorHandler(error, req, res);
+				} else {
+					const middleware = middlewares.shift();
+					if (middleware) {
+						try {
+							await middleware(req, res, next);
+						} catch (err) {
+							errorHandler(err, req, res);
+						}
+					} else {
+						resolve();
+					}
+				}
 			}
-		}
-		next();
+			next();
+		});
 	}
 
 	return {

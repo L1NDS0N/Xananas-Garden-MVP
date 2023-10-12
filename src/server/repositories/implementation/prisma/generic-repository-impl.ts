@@ -32,12 +32,7 @@ export class TGenericRepository<T extends { id: string }> implements IGenericRep
     }
 
     async deleteOne(id: string): Promise<boolean> {
-        try {
             await this.$repository.delete({ where: { id } });
             return true;
-        } catch (error) {
-            console.error({ error })
-            return false;
-        }
     }
 }
