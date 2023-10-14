@@ -1,3 +1,11 @@
+import { TGenericMessage, TGenericMessageArgs } from '@/server/references/generic-error';
+
+export type TGenericErrorParams = {
+	statusCode: HttpStatusCode;
+	message: TGenericMessage;
+	description?: string;
+} & TGenericMessageArgs;
+
 export enum HttpStatusCode {
 	OK = 200,
 	BAD_REQUEST = 400,
@@ -9,32 +17,30 @@ export enum HttpStatusCode {
 export class ApiError extends Error {
 	public readonly statusCode: HttpStatusCode;
 	public readonly description: any;
-
 	constructor(message: string, statusCode: HttpStatusCode, description?: any) {
 		super(message);
-		Object.setPrototypeOf(this, new.target.prototype);
 		this.description = description;
 		this.statusCode = statusCode;
 
+		Object.setPrototypeOf(this, new.target.prototype);
 		Error.captureStackTrace(this);
 	}
 }
+
 export class ErrorHandler {
 	private static instance: ErrorHandler;
 
 	private contextMsg!: string;
 	private errorMsg!: string;
-	private statusCode!: HttpStatusCode;
+	private statusCode = HttpStatusCode.BAD_REQUEST;
 
-	constructor() {
-		ErrorHandler.instance = this;
-	}
 	public static new(): ErrorHandler {
 		if (!ErrorHandler.instance) {
-			new ErrorHandler();
+			ErrorHandler.instance = new ErrorHandler();
 		}
 		return ErrorHandler.instance;
 	}
+
 	public context(contextMessage: string) {
 		this.contextMsg = contextMessage;
 		return this;
@@ -50,23 +56,33 @@ export class ErrorHandler {
 
 	public throw() {
 		console.log(`${this.statusCode} ${this.contextMsg} ${this.errorMsg}`);
+		throw new ApiError(this.errorMsg, this.statusCode, this.contextMsg);
 	}
 }
 
-export class BadRequestError extends ApiError {
-	constructor(message: string, description?: any) {
-		super(message, HttpStatusCode.BAD_REQUEST, description);
+export class GenericError {
+	constructor({ statusCode, message, contexts, cases, description }: TGenericErrorParams) {
+		const error = ErrorHandler.new().code(statusCode).message(message['error'][contexts]['case'][cases] as any);
+		if (description) error.context(description);
+		error.throw()
 	}
 }
 
-export class NotFoundError extends ApiError {
-	constructor(message: string, description?: any) {
-		super(message, HttpStatusCode.NOT_FOUND, description);
+export class BadRequestError {
+	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.BAD_REQUEST, message, cases, contexts, description });
 	}
 }
 
-export class UnauthorizedError extends ApiError {
-	constructor(message: string, description?: any) {
-		super(message, HttpStatusCode.UNATHOURIZED, description);
+export class NotFoundError {
+	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.NOT_FOUND, message, cases, contexts, description });
 	}
 }
+
+export class UnauthorizedError {
+	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.UNATHOURIZED, message, cases, contexts, description });
+	}
+}
+

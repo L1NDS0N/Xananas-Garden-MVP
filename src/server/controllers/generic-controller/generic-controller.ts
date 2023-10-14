@@ -1,14 +1,18 @@
 import { NextApiRouter } from "@/server/core/NextApiRouter";
+import { NotFoundError } from "@/server/helpers/api-error";
+import { GENERIC_MESSAGES, TGenericMessage, TGenericMessageParams } from "@/server/references/generic-error";
 import { IGenericRepository } from "@/server/repositories/interfaces/generic-repository-intf";
 import IGenericController from "./generic-controller.intf";
 
 export default class TGenericController<T> implements IGenericController {
     private $router: NextApiRouter;
     private $repository: IGenericRepository<T>;
+    private $messages: TGenericMessage;
 
-    constructor(router: NextApiRouter, repository: IGenericRepository<T>) {
+    constructor(router: NextApiRouter, repository: IGenericRepository<T>, messagesParams: TGenericMessageParams) {
         this.$router = router;
         this.$repository = repository;
+        this.$messages = GENERIC_MESSAGES(messagesParams);
     }
 
     handler() {
@@ -18,6 +22,7 @@ export default class TGenericController<T> implements IGenericController {
     index() {
         this.$router.get(async (req, res) => {
             const data = await this.$repository.index();
+            if (!data) throw new NotFoundError(this.$messages, { cases: 'not_found', contexts: 'repository' });
             res.send(data)
         });
     }
@@ -25,6 +30,7 @@ export default class TGenericController<T> implements IGenericController {
         this.$router.get(async (req, res) => {
             const { id } = req.query;
             const data = await this.$repository.findOne(id as string);
+            if (!data) throw new NotFoundError(this.$messages, { cases: 'not_found', contexts: 'repository' });
             res.send(data)
         })
     }
@@ -41,7 +47,7 @@ export default class TGenericController<T> implements IGenericController {
     }
     patch() {
         this.$router.put(async (req, res) => {
-            const data = JSON.parse(req.body);
+            const data = req.body;
             const { id } = req.query;
             const updated = await this.$repository.updateOne({ id, ...data })
             res.send(updated);
