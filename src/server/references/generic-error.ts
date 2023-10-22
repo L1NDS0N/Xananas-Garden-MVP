@@ -4,6 +4,17 @@ export type TGenericMessageParams = {
     genre?: 'male' | 'fem';
 }
 
+export type TGenericMessage = ReturnType<typeof GENERIC_MESSAGES>;
+
+type TGenericMessageContexts = {
+    contexts: keyof TGenericMessage['error'];
+}
+type TGenericMessageCases = {
+    cases: keyof TGenericMessage['error'][TGenericMessageContexts['contexts']]['case']
+}
+
+export type TGenericMessageArgs = TGenericMessageContexts & TGenericMessageCases & { field?: string};
+
 export const GENERIC_MESSAGES = ({ subjectSingular, subjectPlural, genre }: TGenericMessageParams) => {
     genre = genre ?? 'male';
     subjectPlural = subjectPlural ?? subjectSingular;
@@ -17,22 +28,13 @@ export const GENERIC_MESSAGES = ({ subjectSingular, subjectPlural, genre }: TGen
         error: {
             repository: {
                 case: {
-                    is_empty: `Não há ${subjectSingular} foram encontrad${pluralGenre}.`,
+                    is_empty: `Não há ${subjectSingular.toLowerCase()} cadastrad${pluralGenre}.`,
                     not_found: `${singGenre.toUpperCase()} ${subjectSingular} não foi encontrad${singGenre}.`,
-                    required_field: ($field: string) => `O campo ${$field} é obrigatório.`
+                    cannot_delete: `Um erro ocorreu e não foi possível remover.`,
+                    required_field: ($field: string) => (`O campo ${$field} é obrigatório.`),
+                    unknow_error: ($field: string) => `Erro desconhecido durante ${$field}.`
                 }
             },
         }
     }
 }
-
-export type TGenericMessage = ReturnType<typeof GENERIC_MESSAGES>;
-
-type TGenericMessageContexts = {
-    contexts: keyof TGenericMessage['error'];
-}
-type TGenericMessageCases = {
-    cases: keyof TGenericMessage['error'][TGenericMessageContexts['contexts']]['case']
-}
-
-export type TGenericMessageArgs = TGenericMessageContexts & TGenericMessageCases;

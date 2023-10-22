@@ -4,6 +4,7 @@ export type TGenericErrorParams = {
 	statusCode: HttpStatusCode;
 	message: TGenericMessage;
 	description?: string;
+	field?: string;
 } & TGenericMessageArgs;
 
 export enum HttpStatusCode {
@@ -61,28 +62,36 @@ export class ErrorHandler {
 }
 
 export class GenericError {
-	constructor({ statusCode, message, contexts, cases, description }: TGenericErrorParams) {
-		const error = ErrorHandler.new().code(statusCode).message(message['error'][contexts]['case'][cases] as any);
-		if (description) error.context(description);
-		error.throw()
+	constructor({ statusCode, message, contexts, cases, description, field }: TGenericErrorParams) {
+		const $case = message['error'][contexts]['case'];
+		const $msg = field ? ($case[cases] as any)(field) : ([$case[cases]]);
+		const $error = ErrorHandler.new().code(statusCode).message($msg);
+		if (description) $error.context(description);
+		$error.throw()
 	}
 }
 
 export class BadRequestError {
-	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
-		new GenericError({ statusCode: HttpStatusCode.BAD_REQUEST, message, cases, contexts, description });
+	constructor(message: TGenericMessage, { cases, contexts, field }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.BAD_REQUEST, message, cases, contexts, description, field });
 	}
 }
 
 export class NotFoundError {
-	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
-		new GenericError({ statusCode: HttpStatusCode.NOT_FOUND, message, cases, contexts, description });
+	constructor(message: TGenericMessage, { cases, contexts, field }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.NOT_FOUND, message, cases, contexts, description, field });
 	}
 }
 
 export class UnauthorizedError {
-	constructor(message: TGenericMessage, { cases, contexts }: TGenericMessageArgs, description?: string) {
-		new GenericError({ statusCode: HttpStatusCode.UNATHOURIZED, message, cases, contexts, description });
+	constructor(message: TGenericMessage, { cases, contexts, field }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.UNATHOURIZED, message, cases, contexts, description, field });
+	}
+}
+
+export class InternalError {
+	constructor(message: TGenericMessage, { cases, contexts, field }: TGenericMessageArgs, description?: string) {
+		new GenericError({ statusCode: HttpStatusCode.INTERNAL_SERVER, message, cases, contexts, description, field });
 	}
 }
 
