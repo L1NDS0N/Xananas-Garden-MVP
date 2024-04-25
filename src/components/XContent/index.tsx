@@ -3,7 +3,7 @@ import Head from "next/head";
 import { DADOS } from "../../faker/catalogo-fake";
 
 interface ICategory {
-  category: string;
+  category?: string;
 }
 
 export default function XContent({ category }: ICategory) {
@@ -16,13 +16,13 @@ export default function XContent({ category }: ICategory) {
       </Head>
       <section data-id="content overflow-auto">
         <div className="m-8">
-          <h1 className="text-xl font-bold">{category}</h1>
+          <h1 className="text-xl font-bold">{category ?? ''}</h1>
         </div>
 
         <div className="overflow-y m-4 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-          {content.map((data) => (
+          {content.map((data, index) => (
             <div
-              key={data.nome}
+              key={index}
               title="Atualmente, o nosso sistema suporta apenas solicitações via Whatsapp."
               className="flex flex-col"
             >
