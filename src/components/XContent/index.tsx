@@ -3,7 +3,7 @@ import Head from "next/head";
 import { DADOS } from "../../faker/catalogo-fake";
 
 interface ICategory {
-  category: string;
+  category?: string;
 }
 
 export default function XContent({ category }: ICategory) {
@@ -16,20 +16,17 @@ export default function XContent({ category }: ICategory) {
       </Head>
       <section data-id="content overflow-auto">
         <div className="m-8">
-          <h1 className="text-xl font-bold">{category}</h1>
+          <h1 className="text-xl font-bold">{category ?? ""}</h1>
         </div>
 
         <div className="overflow-y m-4 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-          {content.map((data) => (
+          {content.map((data, index) => (
             <div
-              key={data.nome}
+              key={index}
               title="Atualmente, o nosso sistema suporta apenas solicitações via Whatsapp."
               className="flex flex-col"
             >
-              <a
-                href="#"
-                className="group rounded border border-zinc-200 hover:shadow-lg"
-              >
+              <div className="group rounded border border-zinc-200 hover:shadow-lg">
                 <div className="flex xs:flex-col xs:items-center md:flex-row md:items-start">
                   <img
                     className="group-hover:shadow-xl xs:w-52 md:aspect-[3/4] md:w-40"
@@ -49,16 +46,14 @@ export default function XContent({ category }: ICategory) {
                       <a
                         href="#"
                         title="Solicitar via whatsapp"
-                        className="invisible flex h-8 w-8 items-center justify-center rounded-full hover:bg-green-400/50 group-hover:visible"
+                        className="invisible flex h-8 w-8 items-center justify-center rounded-full hover:bg-green-400/50 group-hover:visible text-green-600"
                       >
-                        <div className="text-green-600">
-                          <Send size={24} />
-                        </div>
+                        <Send size={24} />
                       </a>
                     </div>
                   </div>
                 </div>
-              </a>
+              </div>
             </div>
           ))}
         </div>
