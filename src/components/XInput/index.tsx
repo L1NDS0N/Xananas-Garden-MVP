@@ -1,15 +1,22 @@
-import React, { forwardRef } from 'react';
+import { TextField } from "@radix-ui/themes";
+import { RootProps } from "@radix-ui/themes/dist/cjs/components/text-field";
 
-type Props = React.InputHTMLAttributes<HTMLInputElement>;
+import { forwardRef } from "react";
+import XIcon, { XIconProps } from "../XIcon";
+
+type Props = RootProps & {
+  icon?: XIconProps;
+};
 
 const XInput = forwardRef((props: Props, ref: any) => {
   return (
-    <input
-      className="p-2 border border-zinc-200 rounded h-10"
-      ref={ref}
-      title={props.placeholder}
-      {...props}
-    />
+    <TextField.Root ref={ref} title={props.placeholder} size="3" {...props}>
+      {props?.icon && (
+        <TextField.Slot>
+          <XIcon {...props.icon} />
+        </TextField.Slot>
+      )}
+    </TextField.Root>
   );
 });
 

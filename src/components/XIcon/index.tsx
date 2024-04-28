@@ -1,15 +1,15 @@
-import * as icons from "lucide-react";
+import { LucideProps } from 'lucide-react';
+import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import dynamic from 'next/dynamic';
 
-export interface IXIconProps {
-  name: keyof typeof icons;
-  tailwindColor: string;
-  size: number;
-};
+export interface XIconProps extends LucideProps {
+  name: keyof typeof dynamicIconImports;
+}
 
-const XIcon = ({ name, tailwindColor, size }: IXIconProps) => {
-  const LucideIcon = icons[name] as icons.LucideIcon;
+const XIcon = ({ name, ...props }: XIconProps) => {
+  const LucideIcon = dynamic(dynamicIconImports[name])
 
-  return <LucideIcon className={tailwindColor} size={size} />;
+  return <LucideIcon {...props} />;
 };
 
 export default XIcon;
